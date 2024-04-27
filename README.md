@@ -63,7 +63,7 @@ This project is a comprehensive application designed to manage various aspects o
   - Description: Get all courses.
   - Response: Array of course objects.
 
-- **GET /api/courses/get/:id**
+- **GET /api/courses/:id**
   - Description: Get a specific course by ID.
   - Response: Course object or error message.
 
@@ -116,7 +116,7 @@ This project is a comprehensive application designed to manage various aspects o
   - Description: Get all class sessions.
   - Response: Array of class session objects.
 
-- **GET /api/sessions/get/:id**
+- **GET /api/sessions/:id**
   - Description: Get a specific class session by ID.
   - Response: Class session object or error message.
 
@@ -138,7 +138,7 @@ This project is a comprehensive application designed to manage various aspects o
   - Description: Delete a class session by ID.
   - Response: Success message or error message.
 
-- **GET /api/sessions/get/:course**
+- **GET /api/sessions/:course**
   - Description: Get class sessions for a specific course by ID.
   - Response: Array of class session objects.
 
@@ -159,7 +159,7 @@ This project is a comprehensive application designed to manage various aspects o
   - Description: Get all resources.
   - Response: Array of resource objects.
 
-- **GET /api/resources/get/:id**
+- **GET /api/resources/:id**
   - Description: Get a specific resource by ID.
   - Response: Resource object or error message.
 
@@ -199,7 +199,7 @@ This project is a comprehensive application designed to manage various aspects o
   - Description: Get all bookings.
   - Response: Array of booking objects.
 
-- **GET /api/bookings/get/:id**
+- **GET /api/bookings/:id**
   - Description: Get a specific booking by ID.
   - Response: Booking object or error message.
 
