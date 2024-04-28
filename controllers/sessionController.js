@@ -3,11 +3,7 @@ const Course = require(`../models/Course`);
 
 // ADD DATA
 const addSession = async (req, res, next) => {
-    const course = req.body.course;
-    const module = req.body.module;
-    const date = req.body.date;
-    const time = req.body.time;
-    const location= req.body.location ;
+    const { course, module, date, startTime, endTime, location } = req.body;
 
     try {
         // Check if the course exists in the database
@@ -19,7 +15,10 @@ const addSession = async (req, res, next) => {
         // Check if any session exists at the given time, date, and location
         const existingSession = await ClassSession.findOne({
             date: date,
-            time: time,
+            $or: [
+                { $and: [{ startTime: { $lte: startTime } }, { endTime: { $gte: startTime } }] },
+                { $and: [{ startTime: { $lte: endTime } }, { endTime: { $gte: endTime } }] }
+            ],
             location: location
         });
         if (existingSession) {
@@ -29,7 +28,10 @@ const addSession = async (req, res, next) => {
         // Check if any session exists with the same date, time, and location for a different course
         const existingSessionSameDateTimeLocation = await ClassSession.findOne({
             date: date,
-            time: time,
+            $or: [
+                { $and: [{ startTime: { $lte: startTime } }, { endTime: { $gte: startTime } }] },
+                { $and: [{ startTime: { $lte: endTime } }, { endTime: { $gte: endTime } }] }
+            ],
             location: location,
             course: { $ne: course }
         });
@@ -42,22 +44,22 @@ const addSession = async (req, res, next) => {
         return res.status(500).json({ error: "Internal server error" });
     }
 
-    const newClassSession = new ClassSession ({
+    const newClassSession = new ClassSession({
         course,
         module,
         date,
-        time,
+        startTime,
+        endTime,
         location
-       
-    })
-    newClassSession.save().then(()=>{
-        res.json("Class session added")
+    });
 
-    }).catch((err)=>{
+    newClassSession.save().then(() => {
+        res.json("Class session added");
+    }).catch((err) => {
         console.log(err);
-
-    })
+    });
 };
+
 
 // READ DATA
 const getSessions = async (req, res, next) => {
@@ -73,7 +75,7 @@ const getSessions = async (req, res, next) => {
 // UPDATE DATA
 const updateSession = async (req, res, next) => {
     let sessionId = req.params.id;
-    const {course, module, date, time, location} = req.body;
+    const { course, module, date, startTime, endTime, location } = req.body;
 
     try {
         // Check if the course exists in the database
@@ -85,7 +87,10 @@ const updateSession = async (req, res, next) => {
         // Check if any session exists at the given time, date, and location
         const existingSession = await ClassSession.findOne({
             date: date,
-            time: time,
+            $or: [
+                { $and: [{ startTime: { $lte: startTime } }, { endTime: { $gte: startTime } }] },
+                { $and: [{ startTime: { $lte: endTime } }, { endTime: { $gte: endTime } }] }
+            ],
             location: location
         });
         if (existingSession && existingSession._id != sessionId) {
@@ -95,7 +100,10 @@ const updateSession = async (req, res, next) => {
         // Check if any session exists with the same date, time, and location for a different course
         const existingSessionSameDateTimeLocation = await ClassSession.findOne({
             date: date,
-            time: time,
+            $or: [
+                { $and: [{ startTime: { $lte: startTime } }, { endTime: { $gte: startTime } }] },
+                { $and: [{ startTime: { $lte: endTime } }, { endTime: { $gte: endTime } }] }
+            ],
             location: location,
             course: { $ne: course }
         });
@@ -103,17 +111,18 @@ const updateSession = async (req, res, next) => {
             return res.status(400).json({ error: "Another class session for a different course already exists at this date, time, and location" });
         }
 
-        const updateClassSession = { 
+        const updateClassSession = {
             course,
             module,
             date,
-            time,
+            startTime,
+            endTime,
             location
         };
 
         // Update the class session
         await ClassSession.findByIdAndUpdate(sessionId, updateClassSession);
-        
+
         res.status(200).json({ status: "Class session updated" });
     } catch (err) {
         console.log(err);

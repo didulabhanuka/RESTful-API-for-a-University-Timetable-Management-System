@@ -11,6 +11,6 @@ router.delete('/delete/:id', checkAuth(['Admin', 'Faculty']), sessionController.
 // For routes accessible by all users
 router.get('/', sessionController.getSessions);
 router.get('/get/:id', sessionController.getSession);
-router.get('/get/:course', sessionController.getCourseSessions);
+router.get('/get/course/:course', sessionController.getCourseSessions);
 
 module.exports = router;
