@@ -2,10 +2,11 @@ const express = require('express');
 const router = express.Router();
 const bookingController = require('../controllers/bookingController');
 
-router.route('/add').post(bookingController.addBooking);
-router.route('/').get(bookingController.getBookings);
-router.route('/update/:id').put(bookingController.updateBooking);
-router.route('/delete/:id').delete(bookingController.deleteBooking);
-router.route('/get/:id').get(bookingController.getBooking);
+router.post('/add', checkAuth(['Student', 'Admin', 'Faculty']), bookingController.addBooking);
+router.get('/', checkAuth(['Student', 'Admin', 'Faculty']), bookingController.getBookings);
+router.put('/update/:id', checkAuth(['Student', 'Admin', 'Faculty']), bookingController.updateBooking);
+router.delete('/delete/:id', checkAuth(['Student', 'Admin', 'Faculty']), bookingController.deleteBooking);
+router.get('/get/:id', checkAuth(['Student', 'Admin', 'Faculty']), bookingController.getBooking);
 
 module.exports = router;
+git 
