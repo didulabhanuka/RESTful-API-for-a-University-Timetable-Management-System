@@ -1,5 +1,7 @@
 const ClassSession = require(`../models/ClassSession`);
 const Course = require(`../models/Course`);
+const User = require('../models/User');
+const Notification = require('../models/Notification');
 
 // ADD DATA
 const addSession = async (req, res, next) => {
@@ -39,25 +41,34 @@ const addSession = async (req, res, next) => {
             return res.status(400).json({ error: "Another class session for a different course already exists at this date, time, and location" });
         }
 
+        // Create the new class session
+        const newClassSession = new ClassSession({
+            course,
+            module,
+            date,
+            startTime,
+            endTime,
+            location
+        });
+
+        await newClassSession.save();
+
+        // Create notifications for enrolled users of the course
+        const enrolledUsers = existingCourse.enrolledUsers;
+        enrolledUsers.forEach(async (userId) => {
+            const notification = new Notification({
+                userId,
+                message: `New class session added for ${existingCourse.courseName}.`,
+                courseId: existingCourse._id
+            });
+            await notification.save();
+        });
+
+        res.status(201).json({ message: "Class session added" });
     } catch (err) {
         console.error(err);
-        return res.status(500).json({ error: "Internal server error" });
+        res.status(500).json({ error: "Internal server error" });
     }
-
-    const newClassSession = new ClassSession({
-        course,
-        module,
-        date,
-        startTime,
-        endTime,
-        location
-    });
-
-    newClassSession.save().then(() => {
-        res.json("Class session added");
-    }).catch((err) => {
-        console.log(err);
-    });
 };
 
 
@@ -111,22 +122,31 @@ const updateSession = async (req, res, next) => {
             return res.status(400).json({ error: "Another class session for a different course already exists at this date, time, and location" });
         }
 
-        const updateClassSession = {
+        // Update the class session
+        await ClassSession.findByIdAndUpdate(sessionId, {
             course,
             module,
             date,
             startTime,
             endTime,
             location
-        };
+        });
 
-        // Update the class session
-        await ClassSession.findByIdAndUpdate(sessionId, updateClassSession);
+        // Create notifications for enrolled users of the course
+        const enrolledUsers = existingCourse.enrolledUsers;
+        enrolledUsers.forEach(async (userId) => {
+            const notification = new Notification({
+                userId,
+                message: `Class session updated for ${existingCourse.courseName}.`,
+                courseId: existingCourse._id
+            });
+            await notification.save();
+        });
 
-        res.status(200).json({ status: "Class session updated" });
+        res.status(200).json({ message: "Class session updated" });
     } catch (err) {
-        console.log(err);
-        res.status(500).json({ status: "Error with updating data", error: err.message });
+        console.error(err);
+        res.status(500).json({ error: "Internal server error" });
     }
 };
 
