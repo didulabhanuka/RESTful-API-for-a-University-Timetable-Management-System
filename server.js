@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const PORT = 3000;
-const mongoose = require('mongoose');
+const connectDB = require(`./config/database`);
 const bodyParser = require("body-parser");
 require("dotenv").config();
 
@@ -13,10 +13,8 @@ const resourcesRoutes = require(`./routes/resources`);
 const bookingsRoutes = require(`./routes/bookings`);
 const notificationRoutes = require(`./routes/notificationRoutes`);
 
-//Connect to DB
-const URL = process.env.MONGODB_URL;
-mongoose.connect(URL)
-  .then(() => console.log('MongoDB Connected Successfully!'));
+//connect db
+connectDB();
 
 //Middleware
 app.use(express.json());
